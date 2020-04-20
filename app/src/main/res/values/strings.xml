@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JSONPlaceholder</string>
+    <string name="text_json_placeholder">JSON Placeholder</string>
+    <string name="button_request_api">Request API</string>
 </resources>
