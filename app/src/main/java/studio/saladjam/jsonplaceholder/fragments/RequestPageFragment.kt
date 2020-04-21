@@ -19,7 +19,12 @@ class RequestPageFragment: Fragment() {
         binding = FragmentRequestpageBinding.inflate(inflater)
 
         binding.buttonRequestapi.setOnClickListener {
-            fragmentManager?.beginTransaction()
+
+            // Request API
+
+            fragmentManager?.beginTransaction()?.let {
+
+            }
         }
 
         return binding.root
