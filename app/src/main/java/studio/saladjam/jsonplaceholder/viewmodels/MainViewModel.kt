@@ -17,7 +17,12 @@ class MainViewModel :ViewModel(), MainNavigator {
     val currentPage: LiveData<Pages>
         get() = _currentPage
 
+    val _previousPage = MutableLiveData<Pages>()
+    val previousPage: LiveData<Pages>
+        get() = _previousPage
+
     override fun navigateTo(page: Pages) {
+        _previousPage.value = _currentPage.value
         _currentPage.value = page
     }
 }

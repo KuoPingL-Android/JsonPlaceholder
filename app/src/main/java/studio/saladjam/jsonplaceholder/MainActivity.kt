@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.activity_main.*
 import studio.saladjam.jsonplaceholder.enums.Pages
 import studio.saladjam.jsonplaceholder.fragments.EntryPageFragment
+import studio.saladjam.jsonplaceholder.fragments.ImagesPageFragment
 import studio.saladjam.jsonplaceholder.viewmodels.MainViewModel
 import studio.saladjam.jsonplaceholder.viewmodels.factories.MainViewModelFactory
 
@@ -31,14 +31,16 @@ class MainActivity : AppCompatActivity() {
                 when(it) {
                     Pages.REQUEST_API -> {
                         val transaction = supportFragmentManager.beginTransaction()
-                        val fragment = EntryPageFragment()
-                        fragment.view?.layoutParams = params
                         transaction.add(R.id.fragment_container, EntryPageFragment(), it.id)
                         transaction.commit()
                     }
 
-                    Pages.DISPLAY_RESULT -> {
-
+                    Pages.DISPLAY_IMAGES -> {
+                        val transaction = supportFragmentManager.beginTransaction()
+                        val fragment = ImagesPageFragment()
+                        transaction.replace(R.id.fragment_container, ImagesPageFragment(), it.id)
+                        transaction.addToBackStack(viewModel.previousPage.value?.id)
+                        transaction.commit()
                     }
 
                     Pages.DISPLAY_SELECTED -> {
