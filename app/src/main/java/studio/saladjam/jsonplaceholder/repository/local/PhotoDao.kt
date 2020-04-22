@@ -1,11 +1,13 @@
 package studio.saladjam.jsonplaceholder.repository.local
 
 import androidx.lifecycle.LiveData
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import studio.saladjam.jsonplaceholder.models.local.DatabasePhoto
 
+@Dao
 interface PhotoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(photos: List<DatabasePhoto>)

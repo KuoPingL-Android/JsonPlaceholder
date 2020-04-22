@@ -2,7 +2,13 @@ package studio.saladjam.jsonplaceholder.repository.remote
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import studio.saladjam.jsonplaceholder.models.network.RemotePhoto
+import studio.saladjam.jsonplaceholder.models.network.toRemotePhotos
+import studio.saladjam.jsonplaceholder.utils.readTextAndClose
+import studio.saladjam.jsonplaceholder.utils.toMutableList
+import java.io.BufferedReader
 import java.io.InputStream
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
@@ -11,7 +17,7 @@ interface PhotosService {
     suspend fun getPhotos(urlString: String): List<RemotePhoto>
 }
 
-object PhotosNetwork: PhotosService {
+object PhotosNetworkService: PhotosService {
 
     const val BASE_URL = "https://jsonplaceholder.typicode.com/photos"
 
@@ -19,6 +25,7 @@ object PhotosNetwork: PhotosService {
         return  withContext(Dispatchers.IO) {
             val inputStream: InputStream
             val jsonString: String
+            val jsonArray: JSONArray
             var list = listOf<RemotePhoto>()
 
             val url = URL(urlString)
@@ -33,10 +40,12 @@ object PhotosNetwork: PhotosService {
             inputStream = conn.inputStream
 
             if (inputStream != null) {
-                jsonString = inputStream.toString()
-                println(jsonString)
+                jsonString = inputStream.readTextAndClose()
+                jsonArray = JSONArray(jsonString)
+                list = jsonArray.toRemotePhotos()
             } else {
                 // TODO: Log ERROR
+                println("inputStream=null")
             }
 
             return@withContext list
