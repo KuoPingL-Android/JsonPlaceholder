@@ -48,6 +48,8 @@ object PhotosNetworkService: PhotosService {
                 println("inputStream=null")
             }
 
+            conn.disconnect()
+
             return@withContext list
         }
     }

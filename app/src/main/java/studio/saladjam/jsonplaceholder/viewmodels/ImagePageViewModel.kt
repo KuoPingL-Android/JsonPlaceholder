@@ -9,7 +9,7 @@ import studio.saladjam.jsonplaceholder.repository.RepositoryDataSource
 import studio.saladjam.jsonplaceholder.repository.local.PhotoDatabase.Companion.getDatabase
 
 class ImagePageViewModel(application: Application) : AndroidViewModel(application) {
-    val photosRepository = RepositoryDataSource(getDatabase(application))
+    private val photosRepository = RepositoryDataSource(getDatabase(application))
 
     private val _photos = photosRepository.photos
     val photos: LiveData<List<DatabasePhoto>>
