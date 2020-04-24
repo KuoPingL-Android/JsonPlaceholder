@@ -9,6 +9,7 @@ import studio.saladjam.jsonplaceholder.models.network.toRemotePhotos
 import studio.saladjam.jsonplaceholder.utils.readTextAndClose
 import studio.saladjam.jsonplaceholder.utils.toMutableList
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
@@ -36,19 +37,27 @@ object PhotosNetworkService: PhotosService {
             // make GET request to the given URL
             conn.connect()
 
-            // receive response as inputStream
-            inputStream = conn.inputStream
+            try {
+                // receive response as inputStream
+                inputStream = conn.inputStream
 
-            if (inputStream != null) {
-                jsonString = inputStream.readTextAndClose()
-                jsonArray = JSONArray(jsonString)
-                list = jsonArray.toRemotePhotos()
-            } else {
-                // TODO: Log ERROR
-                println("inputStream=null")
+                if (inputStream != null) {
+                    jsonString = inputStream.readTextAndClose()
+                    jsonArray = JSONArray(jsonString)
+                    list = jsonArray.toRemotePhotos()
+                } else {
+                    // TODO: Log ERROR
+                    println("inputStream=null")
+                }
+            } catch (e: IOException) {
+                e.stackTrace
+            } finally {
+                try {
+                    conn.disconnect()
+                } catch (e: IOException) {
+                    e.stackTrace
+                }
             }
-
-            conn.disconnect()
 
             return@withContext list
         }

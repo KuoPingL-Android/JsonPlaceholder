@@ -2,57 +2,77 @@ package studio.saladjam.jsonplaceholder.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.ImageView
 import kotlinx.coroutines.*
 import studio.saladjam.jsonplaceholder.R
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
+typealias ImageLoadCompleteHandler = ((Bitmap?) -> Unit)
 object ImageLoader {
     interface ImageCache {
         fun getBitmap(url: String): Bitmap?
         fun putBitmap(url: String, bitmap: Bitmap)
     }
 
+    private const val TIMEOUT = 10000 //ms
+
     private val bitmapCache: ImageCache = LruBitmapCache()
 
-    fun loadBitmap(urlString: String, imageView: ImageView) {
+    fun loadBitmap(urlString: String, imageView: ImageView, completeHandler: ImageLoadCompleteHandler) {
         getBitmapFromMemCache(urlString)?.also {
-            imageView.setImageBitmap(it)
+            completeHandler(it)
         } ?: run {
             CoroutineScope(Dispatchers.Main).launch {
-                imageView.setImageResource(R.drawable.image_placeholder)
                 withContext(Dispatchers.IO) {
                     val url = URL(urlString)
-                    val conn = url.openConnection() as HttpsURLConnection
-                    println("conn created: ${conn}  ===== $urlString")
-                    conn.connect()
-                    println("conn connect")
-                    val inputStream = conn.inputStream
-                    println("INPUT STREAM DONE")
-                    BitmapFactory.Options().run {
-                        // First decode with inJustDecodeBounds=true to check dimensions
-                        inJustDecodeBounds = true
-                        BitmapFactory.decodeStream(inputStream)
+                    val conn = url.openConnection() as HttpURLConnection
+                    try {
+                        conn.connectTimeout = TIMEOUT
+                        // Cannot use Dalvik as the User-Agent for via.placeholder.com
+                        conn.requestMethod = "GET"
+                        conn.setRequestProperty("User-Agent", "Dalvic")
+                        conn.setRequestProperty("Content-Type", "image/png")
+                        conn.connect()
 
-                        // Calculate inSampleSize
-                        inSampleSize = calculateInSampleSize(this,
-                            imageView.width, imageView.height)
-
-                        // Decode bitmap with inSampleSize set
-                        inJustDecodeBounds = false
-
-                        BitmapFactory.decodeStream(inputStream, null, this)
-                    }?.let {
-                        println("SAVED ========= $urlString")
-                        bitmapCache.putBitmap(urlString, it)
+                        var inputStream: InputStream
+                        if (conn.responseCode != HttpURLConnection.HTTP_OK) {
+                            inputStream = conn.errorStream
+                        } else {
+                            BitmapFactory.Options().run {
+                                // First decode with inJustDecodeBounds=true to check dimensions
+                                inJustDecodeBounds = true
+                                inputStream = conn.inputStream
+                                val bytes = inputStream.toByteArray()
+                                inputStream.close()
+                                BitmapFactory.decodeByteArray(bytes, 0,
+                                    bytes.size, this)
+                                // Calculate inSampleSize
+                                inSampleSize = calculateInSampleSize(this,
+                                    imageView.width, imageView.height)
+                                // Decode bitmap with inSampleSize set
+                                inJustDecodeBounds = false
+                                BitmapFactory.decodeByteArray(bytes, 0,
+                                    bytes.size, this)
+                            }?.let {
+                                bitmapCache.putBitmap(urlString, it)
+                            }
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    } finally {
+                        try {
+                            conn.disconnect()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
                     }
                 }
-                getBitmapFromMemCache(urlString)?.let {
-                    println("PLACED ========== $urlString")
-                    imageView.setImageBitmap(it)
-                }
-                println("DONE ======== $urlString")
+                completeHandler(getBitmapFromMemCache(urlString))
             }
         }
     }
@@ -66,6 +86,10 @@ object ImageLoader {
         val (height: Int, width: Int) = options.run { outHeight to outWidth }
         var inSampleSize = 1
 
+        if (reqWidth == 0 || reqHeight == 0) {
+            return inSampleSize
+        }
+        
         if (height > reqHeight || width > reqWidth) {
 
             val halfHeight: Int = height / 2
