@@ -1,5 +1,6 @@
 package studio.saladjam.jsonplaceholder.adapters.recyclerviews
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +44,14 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
                     Toast.LENGTH_SHORT).show()
             }
         }
+
+        holder.itemView.post {
+            ImageLoader.loadBitmap(photo.thumbnailUrl,
+                holder.itemView.width,
+                holder.itemView.height) {
+                holder.setImage(it)
+            }
+        }
     }
 
     class ImageViewHolder(private val binding: ItemImageBinding):
@@ -50,8 +59,10 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
 
         val isLoading: Boolean
             get() = binding.prgressBarImage.visibility == View.VISIBLE
+        var photo: DatabasePhoto? = null
 
         fun bind(photo: DatabasePhoto) {
+            this.photo = photo
             binding.textviewId.text = photo.id
             binding.textviewTitle.text = JSONPlaceholderApplication.INSTANCE
                 .getString(R.string.hint_loading)
@@ -59,22 +70,22 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
 
             binding.image.contentDescription = photo.thumbnailUrl
             binding.image.setImageResource(R.drawable.image_placeholder)
-            ImageLoader.loadBitmap(photo.thumbnailUrl, binding.image)
-            { bitmap ->
-                if(photo.thumbnailUrl == binding.image.contentDescription) {
-                    bitmap?.let {
-                        binding.image.apply {
-                            alpha = 0f
-                            setImageBitmap(it)
-                            animate()
-                                .alpha(1f).duration = 500.toLong()
+        }
 
-                        }
-                        binding.textviewTitle.text = photo.id
-                        binding.prgressBarImage.visibility = View.GONE
-                    }
+        fun setImage(bitmap: Bitmap?) {
+            bitmap?.let {
+                binding.image.apply {
+                    alpha = 0f
+                    setImageBitmap(it)
+                    animate()
+                        .alpha(1f).duration = 500.toLong()
                 }
-            }
+
+            } ?: binding.image.setImageDrawable(JSONPlaceholderApplication.INSTANCE
+                .resources.getDrawable(R.drawable.image_placeholder))
+
+            binding.textviewTitle.text = photo?.id
+            binding.prgressBarImage.visibility = View.GONE
         }
     }
 

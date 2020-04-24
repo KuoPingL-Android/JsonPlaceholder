@@ -16,7 +16,10 @@ class ImagePageViewModel(application: Application) : AndroidViewModel(applicatio
         get() = _photos
 
     private val viewModelJob = SupervisorJob()
-    private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
+    private val viewModelScope = CoroutineScope(viewModelJob +
+            Dispatchers.Main)
+
+    var scrollViewLocation = 0
 
     init {
         refreshPhoto()
