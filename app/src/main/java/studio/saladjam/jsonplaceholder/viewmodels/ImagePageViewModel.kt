@@ -3,6 +3,7 @@ package studio.saladjam.jsonplaceholder.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 import studio.saladjam.jsonplaceholder.models.local.DatabasePhoto
 import studio.saladjam.jsonplaceholder.repository.RepositoryDataSource
@@ -19,7 +20,13 @@ class ImagePageViewModel(application: Application) : AndroidViewModel(applicatio
     private val viewModelScope = CoroutineScope(viewModelJob +
             Dispatchers.Main)
 
-    var scrollViewLocation = 0
+    private val _scrolledPosition = MutableLiveData<Int>()
+    val scrolledPosition : LiveData<Int>
+        get() = _scrolledPosition
+
+    fun setScrolledPosition(position: Int) {
+        _scrolledPosition.value = position
+    }
 
     init {
         refreshPhoto()
