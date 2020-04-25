@@ -49,7 +49,7 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
             ImageLoader.loadBitmap(photo.thumbnailUrl,
                 holder.itemView.width,
                 holder.itemView.height) {
-                holder.setImage(it)
+                holder.setImage(it, photo.thumbnailUrl)
             }
         }
     }
@@ -68,24 +68,26 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
                 .getString(R.string.hint_loading)
             binding.prgressBarImage.visibility = View.VISIBLE
 
-            binding.image.contentDescription = photo.thumbnailUrl
+            binding.image.tag = photo.thumbnailUrl
             binding.image.setImageResource(R.drawable.image_placeholder)
         }
 
-        fun setImage(bitmap: Bitmap?) {
-            bitmap?.let {
-                binding.image.apply {
-                    alpha = 0f
-                    setImageBitmap(it)
-                    animate()
-                        .alpha(1f).duration = 500.toLong()
-                }
+        fun setImage(bitmap: Bitmap?, urlString: String) {
+            if (urlString == binding.image.tag) {
+                bitmap?.let {
+                    binding.image.apply {
+                        alpha = 0f
+                        setImageBitmap(it)
+                        animate()
+                            .alpha(1f).duration = 500.toLong()
+                    }
 
-            } ?: binding.image.setImageDrawable(JSONPlaceholderApplication.INSTANCE
-                .resources.getDrawable(R.drawable.image_placeholder))
+                } ?: binding.image.setImageDrawable(JSONPlaceholderApplication.INSTANCE
+                    .resources.getDrawable(R.drawable.image_placeholder))
 
-            binding.textviewTitle.text = photo?.id
-            binding.prgressBarImage.visibility = View.GONE
+                binding.textviewTitle.text = photo?.id
+                binding.prgressBarImage.visibility = View.GONE
+            }
         }
     }
 
