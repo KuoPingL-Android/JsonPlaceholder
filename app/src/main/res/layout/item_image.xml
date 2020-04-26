@@ -29,7 +29,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_bias="0.3"
             tools:text="1"
-            android:textSize="@dimen/image_text_size" />
+            style="@style/ImagesTextView" />
 
         <TextView
             android:id="@+id/textview_title"
@@ -42,9 +42,9 @@
             android:layout_height="wrap_content"
             android:lines="2"
             android:layout_marginBottom="@dimen/padding_small"
-            android:ellipsize="end"
+            android:ellipsize="none"
             tools:text="this is the title of the textview"
-            android:textSize="@dimen/image_text_size" />
+            style="@style/ImagesTextView"/>
 
         <ProgressBar
             android:id="@+id/prgressBar_image"

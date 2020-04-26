@@ -4,4 +4,6 @@
     <string name="button_request_api">Request API</string>
     <string name="hint_no_data_found">No Data Found</string>
     <string name="hint_loading">Loading</string>
+    <string name="selected_photo_id">id : %s</string>
+    <string name="selected_photo_title">title : %s</string>
 </resources>

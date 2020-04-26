@@ -23,61 +23,61 @@ object ImageLoader {
 
     private val bitmapCache: ImageCache = LruBitmapCache()
 
-    fun loadBitmap(urlString: String, imageView: ImageView, completeHandler: ImageLoadCompleteHandler) {
-        getBitmapFromMemCache(urlString)?.also {
-            completeHandler(it)
-        } ?: run {
-            CoroutineScope(Dispatchers.Main).launch {
-                withContext(Dispatchers.IO) {
-                    val url = URL(urlString)
-                    val conn = url.openConnection() as HttpURLConnection
-                    try {
-                        conn.connectTimeout = TIMEOUT
-                        // Cannot use Dalvik as the User-Agent for via.placeholder.com
-                        conn.requestMethod = "GET"
-                        conn.setRequestProperty("User-Agent", "Dalvic")
-                        conn.setRequestProperty("Content-Type", "image/png")
-                        conn.connect()
-
-                        var inputStream: InputStream
-                        if (conn.responseCode != HttpURLConnection.HTTP_OK) {
-                            inputStream = conn.errorStream
-                        } else {
-                            BitmapFactory.Options().run {
-                                // First decode with inJustDecodeBounds=true to check dimensions
-                                inJustDecodeBounds = true
-                                inputStream = conn.inputStream
-                                val bytes = inputStream.toByteArray()
-                                inputStream.close()
-                                BitmapFactory.decodeByteArray(bytes, 0,
-                                    bytes.size, this)
-
-                                // Calculate inSampleSize
-                                inSampleSize = calculateInSampleSize(this,
-                                    imageView.width, imageView.height)
-
-                                // Decode bitmap with inSampleSize set
-                                inJustDecodeBounds = false
-                                BitmapFactory.decodeByteArray(bytes, 0,
-                                    bytes.size, this)
-                            }?.let {
-                                bitmapCache.putBitmap(urlString, it)
-                            }
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    } finally {
-                        try {
-                            conn.disconnect()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-                completeHandler(getBitmapFromMemCache(urlString))
-            }
-        }
-    }
+//    fun loadBitmap(urlString: String, imageView: ImageView, completeHandler: ImageLoadCompleteHandler) {
+//        getBitmapFromMemCache(urlString)?.also {
+//            completeHandler(it)
+//        } ?: run {
+//            CoroutineScope(Dispatchers.Main).launch {
+//                withContext(Dispatchers.IO) {
+//                    val url = URL(urlString)
+//                    val conn = url.openConnection() as HttpURLConnection
+//                    try {
+//                        conn.connectTimeout = TIMEOUT
+//                        // Cannot use Dalvik as the User-Agent for via.placeholder.com
+//                        conn.requestMethod = "GET"
+//                        conn.setRequestProperty("User-Agent", "Dalvic")
+//                        conn.setRequestProperty("Content-Type", "image/png")
+//                        conn.connect()
+//
+//                        var inputStream: InputStream
+//                        if (conn.responseCode != HttpURLConnection.HTTP_OK) {
+//                            inputStream = conn.errorStream
+//                        } else {
+//                            BitmapFactory.Options().run {
+//                                // First decode with inJustDecodeBounds=true to check dimensions
+//                                inJustDecodeBounds = true
+//                                inputStream = conn.inputStream
+//                                val bytes = inputStream.toByteArray()
+//                                inputStream.close()
+//                                BitmapFactory.decodeByteArray(bytes, 0,
+//                                    bytes.size, this)
+//
+//                                // Calculate inSampleSize
+//                                inSampleSize = calculateInSampleSize(this,
+//                                    imageView.width, imageView.height)
+//
+//                                // Decode bitmap with inSampleSize set
+//                                inJustDecodeBounds = false
+//                                BitmapFactory.decodeByteArray(bytes, 0,
+//                                    bytes.size, this)
+//                            }?.let {
+//                                bitmapCache.putBitmap(urlString, it)
+//                            }
+//                        }
+//                    } catch (e: IOException) {
+//                        e.printStackTrace()
+//                    } finally {
+//                        try {
+//                            conn.disconnect()
+//                        } catch (e: IOException) {
+//                            e.printStackTrace()
+//                        }
+//                    }
+//                }
+//                completeHandler(getBitmapFromMemCache(urlString))
+//            }
+//        }
+//    }
 
     fun loadBitmap(urlString: String, reqWidth: Int, reqHeight: Int, completeHandler: ImageLoadCompleteHandler) {
         getBitmapFromMemCache(urlString)?.also {
