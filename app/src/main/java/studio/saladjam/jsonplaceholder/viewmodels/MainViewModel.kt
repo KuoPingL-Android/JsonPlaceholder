@@ -13,19 +13,23 @@ import studio.saladjam.jsonplaceholder.models.local.DatabasePhoto
  * */
 class MainViewModel :ViewModel(), MainNavigator, ImageSelector {
 
-    private val _currentPage = MutableLiveData<Pages>().apply {
-        value = Pages.REQUEST_API
-    }
+    private val _currentPage = MutableLiveData<Pages>()
     val currentPage: LiveData<Pages>
         get() = _currentPage
 
-    val _previousPage = MutableLiveData<Pages>()
-    val previousPage: LiveData<Pages>
-        get() = _previousPage
+    val _targetPage = MutableLiveData<Pages>().apply {
+        value = Pages.REQUEST_API
+    }
+    val targetPage: LiveData<Pages>
+        get() = _targetPage
 
     override fun navigateTo(page: Pages) {
-        _previousPage.value = _currentPage.value
-        _currentPage.value = page
+        _targetPage.value = page
+    }
+
+    override fun doneNavigateToPage() {
+        _currentPage.value = _targetPage.value
+        _targetPage.value = null
     }
 
     private val _selectedImage = MutableLiveData<DatabasePhoto>()
@@ -38,6 +42,7 @@ class MainViewModel :ViewModel(), MainNavigator, ImageSelector {
 
     override fun doneNavigateToSelectedPhoto() {
         _selectedImage.value = null
+        doneNavigateToPage()
     }
 
 }

@@ -24,25 +24,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewModel.currentPage.observe(this, Observer {
+        viewModel.targetPage.observe(this, Observer {
             it?.let {
-                val params = ConstraintLayout
-                    .LayoutParams(
-                        ConstraintLayout.LayoutParams.MATCH_PARENT,
-                        ConstraintLayout.LayoutParams.MATCH_PARENT)
                 when(it) {
                     Pages.REQUEST_API -> {
                         val transaction = supportFragmentManager.beginTransaction()
                         transaction.add(R.id.fragment_container, EntryPageFragment(), it.id)
                         transaction.commit()
+                        viewModel.doneNavigateToPage()
                     }
 
                     Pages.DISPLAY_IMAGES -> {
                         val transaction = supportFragmentManager.beginTransaction()
                         val fragment = ImagesPageFragment()
                         transaction.replace(R.id.fragment_container, fragment, it.id)
-                        transaction.addToBackStack(viewModel.previousPage.value?.id)
+                        transaction.addToBackStack(viewModel.currentPage.value?.id)
                         transaction.commit()
+                        viewModel.doneNavigateToPage()
                     }
 
                     Pages.DISPLAY_SELECTED -> {
@@ -54,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             fragment.arguments = bundle
                             transaction.replace(R.id.fragment_container, fragment, it.id)
-                            transaction.addToBackStack(viewModel.previousPage.value?.id)
+                            transaction.addToBackStack(viewModel.currentPage.value?.id)
                             transaction.commit()
                             viewModel.doneNavigateToSelectedPhoto()
 
