@@ -82,8 +82,7 @@ class PhotoListAdapter(private val onClickListener: OnClickListener) : ListAdapt
                             .alpha(1f).duration = 500.toLong()
                     }
 
-                } ?: binding.image.setImageDrawable(JSONPlaceholderApplication.INSTANCE
-                    .resources.getDrawable(R.drawable.image_placeholder))
+                }
 
                 binding.textviewTitle.text = photo?.title
                 binding.prgressBarImage.visibility = View.GONE

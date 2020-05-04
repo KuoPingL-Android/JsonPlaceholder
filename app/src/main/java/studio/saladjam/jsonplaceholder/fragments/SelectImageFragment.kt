@@ -41,7 +41,7 @@ class SelectImageFragment : Fragment() {
                         binding.imageSelected.apply {
                             alpha = 0f
                             setImageBitmap(it)
-                            animate().alpha(1f).duration = 500L
+                            animate().alpha(1f).duration = 500.toLong()
                         }
                     } ?: binding.imageSelected.setImageResource(R.drawable.image_placeholder)
                 }

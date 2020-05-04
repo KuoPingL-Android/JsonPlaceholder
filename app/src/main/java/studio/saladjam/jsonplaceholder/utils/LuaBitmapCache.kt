@@ -26,3 +26,4 @@ class LruBitmapCache constructor(sizeInKB: Int = defaultLruCacheSize):
             }
     }
 }
+

@@ -22,6 +22,9 @@ object PhotosNetworkService: PhotosService {
 
     const val BASE_URL = "https://jsonplaceholder.typicode.com/photos"
 
+    // without the withContext, this will cause
+    // "inappropriate blocking method call" warning to occur
+
     override suspend fun getPhotos(urlString: String): List<RemotePhoto> {
         return  withContext(Dispatchers.IO) {
             val inputStream: InputStream
@@ -30,14 +33,12 @@ object PhotosNetworkService: PhotosService {
             var list = listOf<RemotePhoto>()
 
             val url = URL(urlString)
-            // without the withContext, this will cause
-            // "inappropriate blocking method call" warning to occur
+
             val conn = url.openConnection() as HttpsURLConnection
 
-            // make GET request to the given URL
-            conn.connect()
-
             try {
+                // make GET request to the given URL
+                conn.connect()
                 // receive response as inputStream
                 inputStream = conn.inputStream
 

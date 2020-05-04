@@ -6,4 +6,5 @@
     <color name="ios_blue">#147efb</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="black">#000</color>
+    <color name="title_color">#fff</color>
 </resources>

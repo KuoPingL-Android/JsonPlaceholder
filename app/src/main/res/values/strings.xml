@@ -6,4 +6,5 @@
     <string name="hint_loading">Loading</string>
     <string name="selected_photo_id">id : %s</string>
     <string name="selected_photo_title">title : %s</string>
+    <string name="hint_image_not_selected">Not Image selected</string>
 </resources>

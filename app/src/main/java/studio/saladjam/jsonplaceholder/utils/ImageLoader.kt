@@ -104,7 +104,6 @@ object ImageLoader {
                                 inJustDecodeBounds = true
                                 inputStream = conn.inputStream
                                 val bytes = inputStream.toByteArray()
-                                inputStream.close()
                                 BitmapFactory.decodeByteArray(bytes, 0,
                                     bytes.size, this)
 
@@ -144,11 +143,6 @@ object ImageLoader {
         // Raw height and width of image
         val (height: Int, width: Int) = options.run { outHeight to outWidth }
         var inSampleSize = 1
-
-        // In case imageView has not yet loaded properly
-//        if (reqWidth == 0 || reqHeight == 0) {
-//            return inSampleSize
-//        }
 
         if (height > reqHeight || width > reqWidth) {
 
